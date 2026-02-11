@@ -18,8 +18,8 @@ These new maptools will be developed within the 3D canvas beside 3D pointcloud a
 
 * 3D primitive creation
 * 3D boolean operations (intersection, difference, union)
-* 3D arrangement operations (copy n, move, rotate, scale, mirror)
-* 3D modeling operations (divide, extrude, etc.)
+* 3D arrangement operations (copy, move, rotate, scale, mirror)
+* 3D modeling operations (split, extrude, etc.)
 
 ## Proposed Solution
 
@@ -35,8 +35,6 @@ The new maptools will be grouped in 4 new toolbars to increase the modularity th
 
 As the 3D pointcloud attribute edition maptools match the `Qgs3DEditionToolBar` API, it could be easily extracted from the `Qgs3DMapCanvasWidget` class into its own dedicated class.
 
-Many of the new maptools will need the SFCGAL library to be efficient (at least v2.3.0).
-
 ### Active layer selection
 
 For now, to select the active layer we must use the QGIS main window and select a layer within the layer browser panel. But many times when we work with a 3D view, we expand the 3D view to the whole screen to improve the navigation. At this stage to change the current active layer, we have lower the 3D view then lookup for the QGIS main window and then select a layer and at final switch back the 3D view. This is as counter productive as possible.
@@ -46,6 +44,7 @@ This could be solved by adding a layer browser within the 3D view or a drop-down
 ### 3D primitive creation
 
 3D primitives will be saved as PolyhedralSurface and a vector layer that can support this type is mandatory.
+These new maptools will need the SFCGAL library to be efficient (at least v2.3.0).
 
 User workflow:
 
@@ -88,12 +87,13 @@ We like to add the following boolean operations to the toolbar:
 * difference
 * union
 
+These new maptools will need the SFCGAL library to be efficient (at least v2.2.0).
 These operations create a new feature and share the same user workflow:
 
 * select the active layer to save the new object (a QgsVectorLayer with PolyhedralSurface)
 * click on the edit button of the 3D view, the 3D boolean operation toolbar is enabled
 * click a button to select the operation maptool, the maptool user input dialog is shown
-* first the user have to select at least 2 entities (can be more than 2 according to the maptool)
+* first the user have to select at least 2 entities (can be more than 2 for the union maptool)
   * he can select them using the 2D main window by any means
   * he can select them using the 3D view by picking them on screen and with shift/Ctrl modifiers to add/remove entities from the selection
 * the user can validate the operation with the validate button on the dialog or with the ENTER key.
@@ -109,13 +109,13 @@ We like to add the following arrangement operations to the toolbar:
 * rotate
 * scale
 * mirror
-* copy n
+* copy
 
 #### move, rotate, scale
 
 These operations modify the existing features and share the same user workflow:
 
-* select the active layer to save the new object (a QgsVectorLayer with PolyhedralSurface)
+* select the active layer to save the new object (any QgsVectorLayer)
 * click on the edit button of the 3D view, the 3D arrangement operation toolbar is enabled
 * click a button to select the operation maptool, the maptool user input dialog is shown
 * first the user have to select at least 1 entity
@@ -131,11 +131,11 @@ These operations modify the existing features and share the same user workflow:
 
 #### mirror
 
-There will be 3 mirrors operations: one by plane (XY, XZ, YZ).
+There will be four mirrors operations: one by plane (XY, XZ, YZ) and one for any plane.
 
 These operations modify the existing feature and share the same user workflow:
 
-* select the active layer to save the new object (a QgsVectorLayer with PolyhedralSurface)
+* select the active layer to save the new object (any QgsVectorLayer)
 * click on the edit button of the 3D view, the 3D arrangement operation toolbar is enabled
 * click a button to select the operation maptool, the maptool user input dialog is shown
 * first the user have to select 1 entity
@@ -146,11 +146,11 @@ These operations modify the existing feature and share the same user workflow:
 
 !!!! Example(s) !!!!!
 
-#### copy n
+#### copy
 
-This operation creates a new feature, here is its user workflow:
+This operation creates multiple feature, here is its user workflow:
 
-* select the active layer to save the new object (a QgsVectorLayer with PolyhedralSurface)
+* select the active layer to save the new object (any QgsVectorLayer)
 * click on the edit button of the 3D view, the 3D arrangement operation toolbar is enabled
 * click a button to select the operation maptool, the maptool user input dialog is shown
 * first the user have to select at least 1 entity
@@ -167,9 +167,10 @@ This operation creates a new feature, here is its user workflow:
 
 ### 3D modeling operations
 
-#### divide
+#### split
 
-There will be 3 mirrors operations: one by plane (XY, XZ, YZ).
+There will be four split operations: one by plane (XY, XZ, YZ) and one for any plane. We do not plan to split according to a linestring.
+This new maptool will need the SFCGAL library to be efficient (at least v2.3.0).
 
 These operations create 2 new features and share the same user workflow:
 
@@ -189,6 +190,7 @@ These operations create 2 new features and share the same user workflow:
 
 #### extrude
 
+This new maptool will need the SFCGAL library to be efficient (at least v2.3.0).
 This operation modify the existing feature and share the same user workflow:
 
 PFFF plus d'idée là :(
@@ -230,4 +232,4 @@ Proper 3D snapping functionality and entity highlight will greatly benefit to th
 
 ## Backwards Compatibility
 
-These maptools could be backported to any QGIS version with SFCGAL v2.3.0 support enabled.
+Some of theses maptools could be backported to any QGIS version with SFCGAL v2.2.0 support enabled and some to version with SFCGAL v2.2.0 support enabled.
