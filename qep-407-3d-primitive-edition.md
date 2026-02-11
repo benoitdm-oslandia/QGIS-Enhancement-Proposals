@@ -10,11 +10,11 @@
 
 # Summary
 
-We like to extend QGIS by adding 3D user interface functionalities to create primitive objects (like box, sphere, torus, etc.) and to apply 3D operations (like intersection, chamfer, copy, etc.) to existing 3D objects.
+We like to extend QGIS by adding 3D user interface functionalities to create primitive objects (like box, sphere, torus, etc.) and to apply 3D operations (like boolean operations, copy, etc.) to existing 3D objects.
 
 ## 3D edition maptools
 
-These new maptools will be developed within the 3D canvas beside 3D pointcloud attribute edition maptool. 4 groups have been identified:
+These new maptools will be developed within the 3D canvas beside 3D pointcloud attribute edition maptool. Four groups have been identified:
 
 * 3D primitive creation
 * 3D boolean operations (intersection, difference, union)
