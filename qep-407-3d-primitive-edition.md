@@ -1,10 +1,10 @@
 # QGIS Enhancement: Add 3D edition support
 
-**Date** 2026/01/08
+**Date** 2026/03/10
 
-**Author** Benoit De Mezzo ([@benoitdm-oslandia](https://github.com/benoitdm-oslandia))
+**Author** Benoit De Mezzo ([@benoitdm-oslandia](https://github.com/benoitdm-oslandia)), Jean Felder ([@ptitjano](https://github.com/ptitjano)), Loïc Bartoletti ([@lbartoletti](https://github.com/ptitjano))
 
-**Contact** benoit dot de dot mezzo at oslandia dot com
+**Contact** benoit dot de dot mezzo at oslandia dot com, jean dot felder at oslandia dot com, loic dot bartoletti at oslandia dot com
 
 **Version** QGIS 4.2
 
@@ -27,13 +27,13 @@ All these map tools will be available according to the type of the active layer,
 
 * it is not possible to add a 3D primitive like a torus on a RasterLayer or a PointCloudLayer
 * the user will need a VectorLayer with PolyhedralSurface geometry to create 3D primitives
-* the user will able to copy/move/rotate any VectorLayer
+* the user will be able to copy/move/rotate any VectorLayer
 
-Therefore when the active layer changed these map tools will be enabled/disabled according to their ability.
+Therefore when the active layer changes these map tools will be enabled/disabled according to their ability.
 
 The new map tools will be grouped in 4 new toolbars to increase the modularity the `Qgs3DMapCanvasWidget` class. These toolbars will keep their map tools outside the `Qgs3DMapCanvasWidget` class which in return will handle a bunch of edition toolbars. To do so a new abstract class `Qgs3DEditionToolBar` will be added to help in the creation of these edition toolbars.
 
-Currently, the point cloud edition code is directly included in `Qgs3DMapCanvasWidget`. Applying the same approach for the four new classes would make the code unmaintainable. Therefore, the following changes are proposed:
+Currently, the point cloud edition code is directly included in `Qgs3DMapCanvasWidget`. Using the same approach for the four new classes would make the code difficult to maintain. Therefore, the following changes are proposed:
 
 * Move the existing point cloud edition code into its own file.
 * Introduce an abstract class `Qgs3DEditionToolBar`, which all editing toolbars will inherit from, and move the point cloud editing code into this new API.
@@ -41,17 +41,15 @@ Currently, the point cloud edition code is directly included in `Qgs3DMapCanvasW
 
 `Qgs3DEditionToolBar` should have this API:
 
-* does the toolbar should be actived for the layer?  `bool accept( QgsMapLayer *layer )`
+* does the toolbar should be activated for the layer?  `bool accept( QgsMapLayer *layer )`
 * activate the toolbar `void activate( QgsMapLayer *layer )`
 * deactivate the toolbar `void deactivate()`
 
-Note: some mapping tools will require the SFCGAL v2.3.0 library to function correctly. This version is almost finalized; it will be released before this QEP and the resulting PR are validated.
-
 ### Active layer selection
 
-Currently, to select the active layer, a user must open the QGIS 2D main window and choose a layer in the layer browser panel. However, when working in a 3D view, the user often maximizes it to the full screen for easier navigation. To change the active layer in this situation, the user has to lower the 3D view, find the QGIS 2D main window, select a layer, and then return to the 3D view. This process is very inefficient.
+Currently, to select the active layer, a user must open the QGIS 2D main window and choose a layer in the layer browser panel. However, when working in a 3D view, the user may maximise it for easier navigation. To change the active layer in this situation, the user has to lower the 3D view, find the QGIS 2D main window, select a layer, and then return to the 3D view. This process is very inefficient.
 
-This could be solved by adding a layer browser within the 3D view or a drop-down selector with only the editable and VectorLayer layers.
+This could be solved by adding a drop-down selector with only the editable and VectorLayer layers. This drop-down selector will be synchronized with the one on the 2D view. When a layer is selected in this drop-down selector, its editing mode is enabled.
 
 ### 3D primitive creation
 
@@ -71,7 +69,7 @@ These operations share the same user workflow:
   | --- | --- |
   | ![create_primitive_menu](images/qep407/create_cube_input.png) | ![create_primitive_menu](images/qep407/create_torus_input.png) |
 
-* first the user selects the start position (this will set the X, Y and Z translation fields) by clicking on the 3D canvas with the left mouse button or by input value with the keyboard
+* first, the user selects the start position (this will set the X, Y and Z translation fields) by clicking on the 3D canvas with the left mouse button or by input value with the keyboard
 * the user can now set the value of the primitive’s first parameter, either by using the mouse or by entering a value with the keyboard
   * when the mouse moves, a 3D rubberband is displayed between the last clicked point (`prevMapPt`) and the current raycasted point on the map under the mouse (`curMapPt`). Also a temporary representation of the primitive is displayed and adjusted according to the 3D distance between `prevMapPt` and `curMapPt`. The user can hold the Ctrl key while moving the mouse to constraint `curMapPt` movements to an axis or a plane. The constraint axis or plane depends on the current parameter. For example, when setting a height parameter, the constraint will be on the Z axis or when setting a cone radius, the constraint will be on the XY plane
   * focus is set to the parameter field in the dialog, allowing the user to enter a value via the keyboard
@@ -123,7 +121,7 @@ This proposal plans to add the following arrangement operations to the toolbar:
 * rotate
 * scale
 * mirror
-* copy
+* copy   =============================== array
 
 These operations will be applied to a vector layer only.
 
@@ -134,7 +132,7 @@ These operations modify the existing features and share the same user workflow:
 * select the active layer to edit (any QgsVectorLayer). The new features will be saved in this layer
 * click on the edit button of the 3D view, the 3D arrangement operation toolbar is enabled
 * click a button to select the operation map tool, the map tool user input dialog is displayed
-* first the user have to select at least 1 entity
+* first, the user have to select at least 1 entity
   * entities can be selected using the 2D main window by any available method
   * entities can also be selected in the 3D view by picking them on screen, using Shift/Ctrl modifiers to add or remove entities from the selection
 * the user can now set the value of the operation parameter by mouse or with the keyboard
@@ -152,7 +150,7 @@ These operations modify the existing feature and share the same user workflow:
 * select the active layer to edit (any QgsVectorLayer). The new features will be saved in this layer
 * click on the edit button of the 3D view, the 3D arrangement operation toolbar is enabled
 * click a button to select the operation map tool, the map tool user input dialog is displayed
-* first the user have to select 1 entity
+* first, the user have to select 1 entity
   * entity can be selected using the 2D main window by any available method
   * entity can also be selected in the 3D view by picking them on screen, using Shift/Ctrl modifiers to add or remove entities from the selection
 * If an arbitrary plane is chosen, it must be defined by selecting three points in the 3D view
@@ -166,13 +164,13 @@ This operation creates one or multiple features, here is its user workflow:
 * select the active layer to edit (any QgsVectorLayer). The new features will be saved in this layer
 * click on the edit button of the 3D view, the 3D arrangement operation toolbar is enabled
 * click a button to select the operation map tool, the map tool user input dialog is displayed
-* first the user have to select at least 1 entity
+* first, the user have to select at least 1 entity
   * entities can be selected using the 2D main window by any available method
   * entities can also be selected in the 3D view by picking them on screen, using Shift/Ctrl modifiers to add or remove entities from the selection
 * the user can now set the value of the direction and distance parameters by mouse or with the keyboard
   * when the mouse moves, a 3D rubberband is displayed between the selection centroid (`centMapPt`) and the current raycasted point on the map under the mouse (`curMapPt`). Also a temporary representation of the operation result is displayed and adjusted according to the differences between `centMapPt` and `curMapPt`. The user can use the X Y Z keys to constraint lock mouve movements to an axis or a plane. The current constraint is displayed in the dialog
   * focus is set to the parameter field in the dialog, user can set a value with the keyboard for the direction and the distance between copies.
-* the user set the number of copy
+* the user set the number of copies
 * the user validates the operation using the validate button in the dialog or by pressing the ENTER key
 * the feature field dialog is displayed and the user can set the field values for the resulting feature
 * when the user closes the dialog, the resulting feature is added to the layer
@@ -190,7 +188,7 @@ These operations create 2 new features and share the same user workflow:
 * select the active layer to edit (a QgsVectorLayer with PolyhedralSurface). The new features will be saved in this layer
 * click on the edit button of the 3D view, the 3D arrangement operation toolbar is enabled
 * click a button to select the operation map tool, the map tool user input dialog is displayed
-* first the user have to select at least 1 entity
+* first, the user have to select at least 1 entity
   * entities can be selected using the 2D main window by any available method
   * entities can also be selected in the 3D view by picking them on screen, using Shift/Ctrl modifiers to add or remove entities from the selection
 * If an arbitrary plane is chosen, it must be defined by selecting three points in the 3D view
@@ -204,13 +202,13 @@ These operations create 2 new features and share the same user workflow:
 
 #### Extrude
 
-This new map tool will need the SFCGAL library to be efficient (at least v2.3.0).
+This new map tool will need the SFCGAL library to be efficient (at least v2.1.0).
 This operation modify the existing feature and here is its user workflow:
 
 * select the active layer to edit (a QgsVectorLayer with PolyhedralSurface). The new features will be saved in this layer
 * click on the edit button of the 3D view, the 3D arrangement operation toolbar is enabled
 * click a button to select the operation map tool, the map tool user input dialog is displayed
-* first the user have to select at least 1 entity
+* first, the user have to select at least 1 entity
   * entities can be selected using the 2D main window by any available method
   * entities can also be selected in the 3D view by picking them on screen, using Shift/Ctrl modifiers to add or remove entities from the selection
 * the user can now select the the linestrings, the polygons or faces to extrude
@@ -222,12 +220,12 @@ This operation modify the existing feature and here is its user workflow:
 
 ### Affected Files
 
-src/app/3d/qgs3dmapcanvaswidget.cpp
-src/app/3d/qgs3dmapcanvaswidget.h
-src/core/geometry/qgssfcgalengine.cpp
-src/core/geometry/qgssfcgalengine.h
-src/core/geometry/qgssfcgalgeometry.cpp
-src/core/geometry/qgssfcgalgeometry.h
+* src/app/3d/qgs3dmapcanvaswidget.cpp
+* src/app/3d/qgs3dmapcanvaswidget.h
+* src/core/geometry/qgssfcgalengine.cpp
+* src/core/geometry/qgssfcgalengine.h
+* src/core/geometry/qgssfcgalgeometry.cpp
+* src/core/geometry/qgssfcgalgeometry.h
 
 and all new files to handle the new map tools and toolbars.
 
@@ -237,8 +235,4 @@ None
 
 ## Performance Implications
 
-These tools will heavily use the picking via raycast and will need to often update the 3D scene. These might increase the CPU and GPU usage.
-
-## Further Considerations/Improvements
-
-Proper 3D snapping functionality will greatly benefit to these map tools.
+These tools will not impact current performances but will rely on the picking via raycast and may need to often update the 3D scene. While this may increase the CPU and GPU usage it will not affect the user experience.
